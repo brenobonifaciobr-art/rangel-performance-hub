@@ -7,6 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+function authErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "Não foi possível concluir.";
+  if (message.includes("Invalid login credentials")) return "E-mail ou senha incorretos.";
+  if (message.includes("Email not confirmed")) return "Confirme seu e-mail antes de entrar.";
+  if (message.includes("User already registered")) return "Este e-mail já possui uma conta.";
+  if (message.includes("Password should be")) return "A senha não atende aos requisitos de segurança.";
+  if (message.includes("rate limit")) return "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
+  return message;
+}
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -35,11 +45,24 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    let active = true;
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!active) return;
+      if (error) toast.error(authErrorMessage(error));
       if (data.session) navigate({ to: "/visao-geral", replace: true });
     });
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active && session) navigate({ to: "/visao-geral", replace: true });
+    });
+
+    return () => {
+      active = false;
+      data.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -47,28 +70,28 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "criar") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/auth`,
             data: { full_name: fullName },
           },
         });
         if (error) throw error;
-        toast.success("Conta criada. Se a confirmação por e-mail estiver ativa, verifique sua caixa de entrada.");
-        const { data } = await supabase.auth.getSession();
-        if (data.session) navigate({ to: "/visao-geral", replace: true });
+        if (data.session) {
+          navigate({ to: "/visao-geral", replace: true });
+        } else {
+          setPendingConfirmationEmail(email);
+          toast.success("Conta criada. Confirme o e-mail para continuar.");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate({ to: "/visao-geral", replace: true });
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Não foi possível concluir.";
-      toast.error(
-        message.includes("Invalid login credentials") ? "E-mail ou senha incorretos." : message,
-      );
+      toast.error(authErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -103,55 +126,78 @@ function AuthPage() {
             Acesso do profissional. Cada conta enxerga apenas os próprios alunos.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {mode === "criar" ? (
-              <div className="space-y-1.5">
-                <Label htmlFor="nome">Nome completo</Label>
-                <Input
-                  id="nome"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  maxLength={120}
-                />
-              </div>
-            ) : null}
-            <div className="space-y-1.5">
-              <Label htmlFor="email">E-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                maxLength={255}
-              />
+          {pendingConfirmationEmail ? (
+            <div className="mt-6 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+              <p className="font-semibold">Confirme seu e-mail</p>
+              <p className="mt-1 text-muted-foreground">
+                Enviamos as instruções para {pendingConfirmationEmail}. Depois da confirmação, volte
+                para entrar.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-4 w-full"
+                onClick={() => {
+                  setPendingConfirmationEmail(null);
+                  setMode("entrar");
+                }}
+              >
+                Voltar para entrar
+              </Button>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="senha">Senha</Label>
-              <Input
-                id="senha"
-                type="password"
-                autoComplete={mode === "criar" ? "new-password" : "current-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Aguarde..." : mode === "entrar" ? "Entrar" : "Criar conta"}
-            </Button>
-          </form>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                {mode === "criar" ? (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="nome">Nome completo</Label>
+                    <Input
+                      id="nome"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      maxLength={120}
+                    />
+                  </div>
+                ) : null}
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    maxLength={255}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="senha">Senha</Label>
+                  <Input
+                    id="senha"
+                    type="password"
+                    autoComplete={mode === "criar" ? "new-password" : "current-password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Aguarde..." : mode === "entrar" ? "Entrar" : "Criar conta"}
+                </Button>
+              </form>
 
-          <button
-            type="button"
-            className="mt-4 text-sm font-medium text-primary underline-offset-4 hover:underline"
-            onClick={() => setMode(mode === "entrar" ? "criar" : "entrar")}
-          >
-            {mode === "entrar" ? "Ainda não tenho conta" : "Já tenho conta"}
-          </button>
+              <button
+                type="button"
+                className="mt-4 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                onClick={() => setMode(mode === "entrar" ? "criar" : "entrar")}
+              >
+                {mode === "entrar" ? "Ainda não tenho conta" : "Já tenho conta"}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
