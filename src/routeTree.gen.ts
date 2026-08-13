@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedNovaSessaoRouteImport } from './routes/_authenticated/nova-sessao'
+import { Route as AuthenticatedPlanejamentoRouteImport } from './routes/_authenticated/planejamento'
 import { Route as AuthenticatedVisaoGeralRouteImport } from './routes/_authenticated/visao-geral'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated/alunos.index'
 import { Route as AuthenticatedAlunosStudentIdRouteImport } from './routes/_authenticated/alunos.$studentId'
@@ -36,6 +37,12 @@ const AuthenticatedNovaSessaoRoute = AuthenticatedNovaSessaoRouteImport.update({
   path: '/nova-sessao',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlanejamentoRoute =
+  AuthenticatedPlanejamentoRouteImport.update({
+    id: '/planejamento',
+    path: '/planejamento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedVisaoGeralRoute = AuthenticatedVisaoGeralRouteImport.update({
   id: '/visao-geral',
   path: '/visao-geral',
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/nova-sessao': typeof AuthenticatedNovaSessaoRoute
+  '/planejamento': typeof AuthenticatedPlanejamentoRoute
   '/visao-geral': typeof AuthenticatedVisaoGeralRoute
   '/alunos/$studentId': typeof AuthenticatedAlunosStudentIdRoute
   '/alunos/': typeof AuthenticatedAlunosIndexRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/nova-sessao': typeof AuthenticatedNovaSessaoRoute
+  '/planejamento': typeof AuthenticatedPlanejamentoRoute
   '/visao-geral': typeof AuthenticatedVisaoGeralRoute
   '/alunos/$studentId': typeof AuthenticatedAlunosStudentIdRoute
   '/alunos': typeof AuthenticatedAlunosIndexRoute
@@ -76,6 +85,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/nova-sessao': typeof AuthenticatedNovaSessaoRoute
+  '/_authenticated/planejamento': typeof AuthenticatedPlanejamentoRoute
   '/_authenticated/visao-geral': typeof AuthenticatedVisaoGeralRoute
   '/_authenticated/alunos/$studentId': typeof AuthenticatedAlunosStudentIdRoute
   '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/nova-sessao'
+    | '/planejamento'
     | '/visao-geral'
     | '/alunos/$studentId'
     | '/alunos/'
@@ -94,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/nova-sessao'
+    | '/planejamento'
     | '/visao-geral'
     | '/alunos/$studentId'
     | '/alunos'
@@ -103,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/nova-sessao'
+    | '/_authenticated/planejamento'
     | '/_authenticated/visao-geral'
     | '/_authenticated/alunos/$studentId'
     | '/_authenticated/alunos/'
@@ -144,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNovaSessaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planejamento': {
+      id: '/_authenticated/planejamento'
+      path: '/planejamento'
+      fullPath: '/planejamento'
+      preLoaderRoute: typeof AuthenticatedPlanejamentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/visao-geral': {
       id: '/_authenticated/visao-geral'
       path: '/visao-geral'
@@ -170,6 +190,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedNovaSessaoRoute: typeof AuthenticatedNovaSessaoRoute
+  AuthenticatedPlanejamentoRoute: typeof AuthenticatedPlanejamentoRoute
   AuthenticatedVisaoGeralRoute: typeof AuthenticatedVisaoGeralRoute
   AuthenticatedAlunosStudentIdRoute: typeof AuthenticatedAlunosStudentIdRoute
   AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
@@ -177,6 +198,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNovaSessaoRoute: AuthenticatedNovaSessaoRoute,
+  AuthenticatedPlanejamentoRoute: AuthenticatedPlanejamentoRoute,
   AuthenticatedVisaoGeralRoute: AuthenticatedVisaoGeralRoute,
   AuthenticatedAlunosStudentIdRoute: AuthenticatedAlunosStudentIdRoute,
   AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,
