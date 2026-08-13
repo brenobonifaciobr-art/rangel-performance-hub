@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedVisaoGeralRouteImport } from './routes/_authenticated/visao-geral'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated/alunos.index'
+import { Route as AuthenticatedAlunosStudentIdRouteImport } from './routes/_authenticated/alunos.$studentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,17 +41,25 @@ const AuthenticatedAlunosIndexRoute =
     path: '/alunos/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAlunosStudentIdRoute =
+  AuthenticatedAlunosStudentIdRouteImport.update({
+    id: '/alunos/$studentId',
+    path: '/alunos/$studentId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/visao-geral': typeof AuthenticatedVisaoGeralRoute
+  '/alunos/$studentId': typeof AuthenticatedAlunosStudentIdRoute
   '/alunos/': typeof AuthenticatedAlunosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/visao-geral': typeof AuthenticatedVisaoGeralRoute
+  '/alunos/$studentId': typeof AuthenticatedAlunosStudentIdRoute
   '/alunos': typeof AuthenticatedAlunosIndexRoute
 }
 export interface FileRoutesById {
@@ -59,19 +68,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/visao-geral': typeof AuthenticatedVisaoGeralRoute
+  '/_authenticated/alunos/$studentId': typeof AuthenticatedAlunosStudentIdRoute
   '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/visao-geral' | '/alunos/'
+  fullPaths: '/' | '/auth' | '/visao-geral' | '/alunos/$studentId' | '/alunos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/visao-geral' | '/alunos'
+  to: '/' | '/auth' | '/visao-geral' | '/alunos/$studentId' | '/alunos'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/visao-geral'
+    | '/_authenticated/alunos/$studentId'
     | '/_authenticated/alunos/'
   fileRoutesById: FileRoutesById
 }
@@ -118,16 +129,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlunosIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/alunos/$studentId': {
+      id: '/_authenticated/alunos/$studentId'
+      path: '/alunos/$studentId'
+      fullPath: '/alunos/$studentId'
+      preLoaderRoute: typeof AuthenticatedAlunosStudentIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedVisaoGeralRoute: typeof AuthenticatedVisaoGeralRoute
+  AuthenticatedAlunosStudentIdRoute: typeof AuthenticatedAlunosStudentIdRoute
   AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVisaoGeralRoute: AuthenticatedVisaoGeralRoute,
+  AuthenticatedAlunosStudentIdRoute: AuthenticatedAlunosStudentIdRoute,
   AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,
 }
 
