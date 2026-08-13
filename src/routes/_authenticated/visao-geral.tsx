@@ -93,7 +93,9 @@ function Overview() {
         description="Prioridade do dia e estado operacional da semana."
         action={
           <Button asChild>
-            <Link to="/nova-sessao">Registrar sessão</Link>
+            <Link to="/nova-sessao" search={{ aluno: "", plano: "" }}>
+              Registrar sessão
+            </Link>
           </Button>
         }
       />
