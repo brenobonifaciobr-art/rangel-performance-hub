@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedNovaSessaoRouteImport } from './routes/_authenticated/nova-sessao'
 import { Route as AuthenticatedPlanejamentoRouteImport } from './routes/_authenticated/planejamento'
 import { Route as AuthenticatedVisaoGeralRouteImport } from './routes/_authenticated/visao-geral'
@@ -31,6 +32,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNovaSessaoRoute = AuthenticatedNovaSessaoRouteImport.update({
   id: '/nova-sessao',
@@ -64,6 +70,7 @@ const AuthenticatedAlunosStudentIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
   '/nova-sessao': typeof AuthenticatedNovaSessaoRoute
   '/planejamento': typeof AuthenticatedPlanejamentoRoute
   '/visao-geral': typeof AuthenticatedVisaoGeralRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
   '/nova-sessao': typeof AuthenticatedNovaSessaoRoute
   '/planejamento': typeof AuthenticatedPlanejamentoRoute
   '/visao-geral': typeof AuthenticatedVisaoGeralRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/nova-sessao': typeof AuthenticatedNovaSessaoRoute
   '/_authenticated/planejamento': typeof AuthenticatedPlanejamentoRoute
   '/_authenticated/visao-geral': typeof AuthenticatedVisaoGeralRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/historico'
     | '/nova-sessao'
     | '/planejamento'
     | '/visao-geral'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/historico'
     | '/nova-sessao'
     | '/planejamento'
     | '/visao-geral'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/historico'
     | '/_authenticated/nova-sessao'
     | '/_authenticated/planejamento'
     | '/_authenticated/visao-geral'
@@ -149,6 +161,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/historico': {
+      id: '/_authenticated/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/nova-sessao': {
       id: '/_authenticated/nova-sessao'
@@ -189,6 +208,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedNovaSessaoRoute: typeof AuthenticatedNovaSessaoRoute
   AuthenticatedPlanejamentoRoute: typeof AuthenticatedPlanejamentoRoute
   AuthenticatedVisaoGeralRoute: typeof AuthenticatedVisaoGeralRoute
@@ -197,6 +217,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedNovaSessaoRoute: AuthenticatedNovaSessaoRoute,
   AuthenticatedPlanejamentoRoute: AuthenticatedPlanejamentoRoute,
   AuthenticatedVisaoGeralRoute: AuthenticatedVisaoGeralRoute,
