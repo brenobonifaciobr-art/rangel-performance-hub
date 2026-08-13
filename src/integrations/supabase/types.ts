@@ -485,7 +485,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      save_session: { Args: { payload: Json }; Returns: string }
+      seed_demo_data: { Args: never; Returns: string }
     }
     Enums: {
       attendance: "presente" | "reposicao" | "falta" | "cancelada"
