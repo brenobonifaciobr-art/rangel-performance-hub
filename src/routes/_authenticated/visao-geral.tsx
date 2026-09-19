@@ -88,7 +88,7 @@ function Overview() {
     <>
       <PageHeader
         eyebrow="Treinar, registrar. Evoluir."
-        title="Visão minificada"
+        title="Visão Teste"
         description="Prioridade do dia e estado operacional da semana."
         action={
           <Button asChild>
