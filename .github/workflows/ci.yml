@@ -16,9 +16,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: yarn install --frozen-lockfile
       - name: Build application
-        run: bun run build
+        run: yarn build
