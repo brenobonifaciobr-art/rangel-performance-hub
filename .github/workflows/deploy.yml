@@ -1,7 +1,9 @@
 name: Deploy
 
-# Fluxo automático: push na main -> build -> (migrations opcionais) -> publicação do site.
-# Não é preciso abrir o Lovable em momento algum.
+# Fluxo automático:
+# push na main -> build -> migrations -> GitHub Pages.
+#
+# Não é necessário abrir a Lovable para publicar o site.
 
 on:
   push:
@@ -11,35 +13,50 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: deploy-main
+  group: deploy-pages
   cancel-in-progress: false
-
-env:
-  LOVABLE_PROJECT_ID: 9d9235cf-a277-4585-b588-3b7bce13263e
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: yarn
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
+
+      - name: Instalar dependências
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Preparar artifact do GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
 
   migrations:
     name: Banco de dados
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Aplicar migrations (se SUPABASE_DB_URL estiver configurada)
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -48,54 +65,25 @@ jobs:
             echo "SUPABASE_DB_URL não configurada — pulando aplicação de migrations."
             exit 0
           fi
+
           curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz \
             | tar -xz -C /usr/local/bin supabase
-          supabase db push --db-url "$SUPABASE_DB_URL" --include-all
+
+          supabase db push \
+            --db-url "$SUPABASE_DB_URL" \
+            --include-all
 
   publish:
     name: Publicar site
     needs: [build, migrations]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Disparar publicação e aguardar conclusão
-        env:
-          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -z "${LOVABLE_API_KEY:-}" ]; then
-            echo "::error::Secret LOVABLE_API_KEY ausente. Adicione em Settings > Secrets and variables > Actions."
-            exit 1
-          fi
-
-          API="https://api.lovable.dev/v1/projects/${LOVABLE_PROJECT_ID}"
-
-          # Aguarda o Lovable terminar de sincronizar o commit recém-enviado.
-          sleep 45
-
-          RESP=$(curl -fsS -X POST "$API/publish" \
-            -H "Lovable-API-Key: $LOVABLE_API_KEY" \
-            -H "Lovable-Version: 2026-09-11" \
-            -H "Content-Type: application/json" \
-            -d '{}')
-          echo "$RESP"
-          DEPLOY_ID=$(echo "$RESP" | jq -r '.id')
-
-          for i in $(seq 1 100); do
-            sleep 6
-            STATUS_JSON=$(curl -fsS "$API/publish/$DEPLOY_ID" \
-              -H "Lovable-API-Key: $LOVABLE_API_KEY" \
-              -H "Lovable-Version: 2026-09-11")
-            STATUS=$(echo "$STATUS_JSON" | jq -r '.status')
-            echo "status: $STATUS"
-            case "$STATUS" in
-              completed)
-                echo "Publicado: $(echo "$STATUS_JSON" | jq -r '.url')"
-                exit 0 ;;
-              error)
-                echo "::error::Falha na publicação: $(echo "$STATUS_JSON" | jq -r '.error_message')"
-                exit 1 ;;
-            esac
-          done
-          echo "::error::Tempo esgotado aguardando a publicação."
-          exit 1
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
