@@ -27,9 +27,8 @@ function Stat({ label, value, tone }: { label: string; value: string | number; t
     <div className="rst-surface p-4">
       <p className="rst-eyebrow">{label}</p>
       <p
-        className={`mt-1 font-[family-name:var(--font-display)] text-3xl font-extrabold ${
-          tone === "primary" ? "text-primary" : "text-foreground"
-        }`}
+        className={`mt-1 font-[family-name:var(--font-display)] text-3xl font-extrabold ${tone === "primary" ? "text-primary" : "text-foreground"
+          }`}
       >
         {value}
       </p>
@@ -89,7 +88,7 @@ function Overview() {
     <>
       <PageHeader
         eyebrow="Treinar, registrar. Evoluir."
-        title="Visão geral"
+        title="Visão minificada"
         description="Prioridade do dia e estado operacional da semana."
         action={
           <Button asChild>
