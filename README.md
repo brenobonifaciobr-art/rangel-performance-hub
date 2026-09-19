@@ -224,11 +224,13 @@ Continue developing this project in the [Lovable editor](https://lovable.dev/pro
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Prefer working locally? You need Node.js 22+ and **Yarn** (`corepack enable && corepack prepare yarn@1.22.22 --activate`).
 
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
-npm i
-npm run dev
+yarn install
+yarn dev
 ```
+
+Outros comandos: `yarn build`, `yarn preview`, `yarn lint`, `yarn format`.
