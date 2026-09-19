@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedNovaSessaoRouteImport } from './routes/_authenticated/nova-sessao'
@@ -24,7 +24,7 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -36,35 +36,35 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
   id: '/historico',
   path: '/historico',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedNovaSessaoRoute = AuthenticatedNovaSessaoRouteImport.update({
   id: '/nova-sessao',
   path: '/nova-sessao',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedPlanejamentoRoute =
   AuthenticatedPlanejamentoRouteImport.update({
     id: '/planejamento',
     path: '/planejamento',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedVisaoGeralRoute = AuthenticatedVisaoGeralRouteImport.update({
   id: '/visao-geral',
   path: '/visao-geral',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAlunosIndexRoute =
   AuthenticatedAlunosIndexRouteImport.update({
     id: '/alunos/',
     path: '/alunos/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAlunosStudentIdRoute =
   AuthenticatedAlunosStudentIdRouteImport.update({
     id: '/alunos/$studentId',
     path: '/alunos/$studentId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -90,7 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/nova-sessao': typeof AuthenticatedNovaSessaoRoute
@@ -135,7 +135,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
@@ -152,7 +152,7 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -167,47 +167,47 @@ declare module '@tanstack/react-router' {
       path: '/historico'
       fullPath: '/historico'
       preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/nova-sessao': {
       id: '/_authenticated/nova-sessao'
       path: '/nova-sessao'
       fullPath: '/nova-sessao'
       preLoaderRoute: typeof AuthenticatedNovaSessaoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/planejamento': {
       id: '/_authenticated/planejamento'
       path: '/planejamento'
       fullPath: '/planejamento'
       preLoaderRoute: typeof AuthenticatedPlanejamentoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/visao-geral': {
       id: '/_authenticated/visao-geral'
       path: '/visao-geral'
       fullPath: '/visao-geral'
       preLoaderRoute: typeof AuthenticatedVisaoGeralRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/alunos/': {
       id: '/_authenticated/alunos/'
       path: '/alunos'
       fullPath: '/alunos/'
       preLoaderRoute: typeof AuthenticatedAlunosIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/alunos/$studentId': {
       id: '/_authenticated/alunos/$studentId'
       path: '/alunos/$studentId'
       fullPath: '/alunos/$studentId'
       preLoaderRoute: typeof AuthenticatedAlunosStudentIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedRouteChildren {
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedNovaSessaoRoute: typeof AuthenticatedNovaSessaoRoute
   AuthenticatedPlanejamentoRoute: typeof AuthenticatedPlanejamentoRoute
@@ -216,7 +216,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
 }
 
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedNovaSessaoRoute: AuthenticatedNovaSessaoRoute,
   AuthenticatedPlanejamentoRoute: AuthenticatedPlanejamentoRoute,
@@ -225,12 +225,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,
 }
 
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
